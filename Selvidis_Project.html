@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Μαθηματικά 6ης Δημοτικού</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #1a365d;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+        }
+
+        .exercise-types {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .exercise-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .exercise-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .exercise-card h2 {
+            color: #2c5282;
+            margin-bottom: 0.5rem;
+        }
+
+        .exercise {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .option {
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .option:hover {
+            background-color: #f7fafc;
+        }
+
+        .option.selected {
+            background-color: #ebf8ff;
+            border-color: #4299e1;
+        }
+
+        button {
+            background-color: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        button:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+
+        .feedback.correct {
+            background-color: #c6f6d5;
+            color: #276749;
+        }
+
+        .feedback.incorrect {
+            background-color: #fed7d7;
+            color: #9b2c2c;
+        }
+
+        .back-button {
+            margin-top: 1rem;
+            background-color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="home-screen">
+            <h1>Μαθηματικά 6ης Δημοτικού</h1>
+            <div class="exercise-types">
+                <div class="exercise-card" onclick="startExercise('true-false')">
+                    <h2>Σωστό ή Λάθος</h2>
+                    <p>Απάντησε αν οι προτάσεις είναι σωστές ή λάθος</p>
+                </div>
+                <div class="exercise-card" onclick="startExercise('fill-in-blank')">
+                    <h2>Συμπλήρωση Κενών</h2>
+                    <p>Συμπλήρωσε τα κενά στις μαθηματικές προτάσεις</p>
+                </div>
+                <div class="exercise-card" onclick="startExercise('quiz')">
+                    <h2>Κουίζ</h2>
+                    <p>Διάλεξε τη σωστή απάντηση</p>
+                </div>
+            </div>
+        </div>
+        <div id="exercise-screen" style="display: none">
+            <div id="exercise-container"></div>
+            <button onclick="goHome()" class="back-button">Αρχική Σελίδα</button>
+        </div>
+    </div>
+
+    <script>
+        const exercises = {
+            'true-false': [
+                {
+                    question: "Το άθροισμα των γωνιών ενός τριγώνου είναι 180 μοίρες",
+                    options: ["Σωστό", "Λάθος"],
+                    correctAnswer: "Σωστό",
+                    explanation: "Το άθροισμα των γωνιών κάθε τριγώνου είναι πάντα 180 μοίρες"
+                },
+                {
+                    question: "Κάθε τετράγωνο είναι ρόμβος",
+                    options: ["Σωστό", "Λάθος"],
+                    correctAnswer: "Σωστό",
+                    explanation: "Το τετράγωνο έχει όλες τις ιδιότητες του ρόμβου"
+                },
+                {
+                    question: "Ο κύβος έχει 8 κορυφές",
+                    options: ["Σωστό", "Λάθος"],
+                    correctAnswer: "Σωστό",
+                    explanation: "Ο κύβος έχει 8 κορυφές, 12 ακμές και 6 έδρες"
+                },
+                {
+                    question: "Το 15 είναι πολλαπλάσιο του 4",
+                    options: ["Σωστό", "Λάθος"],
+                    correctAnswer: "Λάθος",
+                    explanation: "Το 15 δεν διαιρείται ακριβώς με το 4"
+                }
+            ],
+            'fill-in-blank': [
+                {
+                    question: "Το εμβαδόν ενός ορθογωνίου είναι ίσο με ___ επί ύψος",
+                    options: ["μήκος", "πλάτος", "περίμετρος", "διαγώνιος"],
+                    correctAnswer: "μήκος",
+                    explanation: "Το εμβαδόν ορθογωνίου υπολογίζεται πολλαπλασιάζοντας το μήκος με το ύψος"
+                },
+                {
+                    question: "Η περίμετρος ενός τετραγώνου είναι ίση με ___ επί την πλευρά του",
+                    options: ["τέσσερα", "δύο", "τρία", "ένα"],
+                    correctAnswer: "τέσσερα",
+                    explanation: "Η περίμετρος τετραγώνου είναι 4 φορές η πλευρά του"
+                },
+                {
+                    question: "Το ___ είναι το σημείο που ισαπέχει από όλα τα σημεία του κύκλου",
+                    options: ["κέντρο", "τόξο", "σημείο", "μήκος"],
+                    correctAnswer: "κέντρο",
+                    explanation: "Το κέντρο του κύκλου ισαπέχει από όλα τα σημεία της περιφέρειας"
+                },
+                {
+                    question: "Ένα ___ είναι ένα πολύγωνο με τρεις πλευρές",
+                    options: ["τρίγωνο", "τετράγωνο", "πεντάγωνο", "εξάγωνο"],
+                    correctAnswer: "τρίγωνο",
+                    explanation: "Το τρίγωνο είναι το πιο απλό πολύγωνο με 3 πλευρές και 3 γωνίες"
+                }
+            ],
+            'quiz': [
+                {
+                    question: "Πόσο κάνει 3/4 + 1/4;",
+                    options: ["1", "2/4", "4/4", "5/4"],
+                    correctAnswer: "1",
+                    explanation: "3/4 + 1/4 = 4/4 = 1"
+                },
+                {
+                    question: "Ποιος είναι ο μέγιστος κοινός διαιρέτης των 12 και 18;",
+                    options: ["6", "3", "9", "12"],
+                    correctAnswer: "6",
+                    explanation: "Οι κοινοί διαιρέτες του 12 και 18 είναι 1, 2, 3, 6 και ο μεγαλύτερος είναι το 6"
+                },
+                {
+                    question: "Πόσες μοίρες είναι η ορθή γωνία;",
+                    options: ["90", "180", "45", "360"],
+                    correctAnswer: "90",
+                    explanation: "Η ορθή γωνία είναι 90 μοίρες"
+                },
+                {
+                    question: "Ποιο είναι το εμβαδόν ενός τετραγώνου με πλευρά 5 εκατοστά;",
+                    options: ["25", "20", "15", "10"],
+                    correctAnswer: "25",
+                    explanation: "Το εμβαδόν τετραγώνου είναι πλευρά επί πλευρά, άρα 5 × 5 = 25 τετραγωνικά εκατοστά"
+                }
+            ]
+        };
+
+        let currentType = '';
+        let currentExerciseIndex = 0;
+        let selectedAnswer = '';
+
+        function startExercise(type) {
+            currentType = type;
+            currentExerciseIndex = 0;
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('exercise-screen').style.display = 'block';
+            showExercise();
+        }
+
+        function showExercise() {
+            const exercise = exercises[currentType][currentExerciseIndex];
+            selectedAnswer = '';
+            
+            let html = `
+                <div class="exercise">
+                    <h2>${exercise.question}</h2>
+                    <div class="options">
+            `;
+            
+            exercise.options.forEach(option => {
+                html += `
+                    <div class="option" onclick="selectAnswer('${option}')">
+                        ${option}
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                    <button onclick="checkAnswer()" id="submit-btn" disabled>Υποβολή</button>
+                    <div id="feedback" style="display: none"></div>
+                </div>
+            `;
+            
+            document.getElementById('exercise-container').innerHTML = html;
+        }
+
+        function selectAnswer(answer) {
+            selectedAnswer = answer;
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.textContent.trim() === answer) {
+                    opt.classList.add('selected');
+                }
+            });
+            document.getElementById('submit-btn').disabled = false;
+        }
+
+        function checkAnswer() {
+            const exercise = exercises[currentType][currentExerciseIndex];
+            const isCorrect = selectedAnswer === exercise.correctAnswer;
+            const feedbackDiv = document.getElementById('feedback');
+            
+            feedbackDiv.style.display = 'block';
+            feedbackDiv.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedbackDiv.innerHTML = `
+                <p><strong>${isCorrect ? 'Μπράβο! Σωστή απάντηση!' : 'Λάθος απάντηση'}</strong></p>
+                <p>${exercise.explanation}</p>
+                <button onclick="nextExercise()" style="margin-top: 1rem">
+                    ${currentExerciseIndex < exercises[currentType].length - 1 ? 'Επόμενη Άσκηση' : 'Τέλος Ασκήσεων'}
+                </button>
+            `;
+            
+            document.getElementById('submit-btn').style.display = 'none';
+        }
+
+        function nextExercise() {
+            if (currentExerciseIndex < exercises[currentType].length - 1) {
+                currentExerciseIndex++;
+                showExercise();
+            } else {
+                goHome();
+            }
+        }
+
+        function goHome() {
+            document.getElementById('exercise-screen').style.display = 'none';
+            document.getElementById('home-screen').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
